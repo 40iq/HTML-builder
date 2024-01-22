@@ -24,16 +24,19 @@ const clearDirectory = (curPath) => {
   fs.readdir(curPath, { withFileTypes: true }, (err, files) => {
     if (err) console.log('ErroR');
 
-    if (files.length === 0) {
-      fs.rmdir(path.join(curPath), () => {});
-    }
+    let filesToDelete = files.length;
 
     files.forEach((file) => {
       if (file.isFile()) {
         fs.unlink(path.join(curPath, file.name), () => {});
+        filesToDelete -= 1;
       }
       if (file.isDirectory()) {
         clearDirectory(path.join(curPath, file.name));
+        filesToDelete -= 1;
+      }
+      if (filesToDelete === 0) {
+        fs.rmdir(path.join(curPath, file.name), () => {});
       }
     });
   });
