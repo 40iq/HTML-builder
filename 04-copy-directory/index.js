@@ -8,12 +8,24 @@ const createCopy = (callback) => {
   fs.mkdir(copyFolderPath, (err) => {
     if (err) {
       console.log('Folder already exist');
+      fs.readdir(copyFolderPath, (err, files) => {
+        let filesToDelete = files.length;
+        if (err) throw new Error();
+        files.forEach((file) => {
+          filesToDelete -= 1;
+          fs.unlink(path.join(copyFolderPath, file), (error) => {
+            if (error) throw new Error();
+          });
+          if (filesToDelete === 0) {
+            callback();
+          }
+        });
+      });
       return;
     }
     console.log('Folder created');
+    callback();
   });
-
-  callback();
 };
 
 const copyFiles = () => {
